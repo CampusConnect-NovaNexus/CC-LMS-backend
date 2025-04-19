@@ -16,7 +16,7 @@ This documentation provides details on the Campus Connect Exam API endpoints, th
 └─────────┘   │   └───────────┘     │exam_date  │
      ▲        │        ▲            │created_by │
      │        │        │            └───────────┘
-     │        │        │                 ▲
+     │        │        │                  ▲
 ┌────┴──────┐ │   ┌────┴──────┐           │
 │Syllabus   │ │   │Enrollment │      ┌────┴──────┐
 │  Item     │ │   ├───────────┤      │Checklist  │
