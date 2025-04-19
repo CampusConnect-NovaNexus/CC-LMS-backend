@@ -1,0 +1,11 @@
+Flask
+Flask-CORS
+Flask-Migrate
+flask-sqlalchemy 
+pgvector 
+psycopg2-binary
+langchain-mistralai
+langchain 
+langchain-community 
+upstash-vector
+waitress
