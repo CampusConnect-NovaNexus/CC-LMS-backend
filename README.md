@@ -1,4 +1,4 @@
-# Campus Connect Exam API Documentation
+# Campus Connect LMS API Documentation
 
 ## API Overview
 This documentation provides details on the Campus Connect Exam API endpoints, their usage, and the database structure to help frontend developers integrate with the backend.
@@ -7,26 +7,26 @@ This documentation provides details on the Campus Connect Exam API endpoints, th
 
 ### Entity Relationship Diagram
 ```
-┌─────────┐       ┌─────────┐       ┌──────────┐
-│  User   │       │ Course  │       │   Exam   │
-├─────────┤       ├─────────┤       ├──────────┤
-│ user_id │◄──┐   │course_code│◄─┐  │ exam_id  │
+┌─────────┐       ┌───────────┐     ┌───────────┐
+│  User   │       │ Course    │     │   Exam    │
+├─────────┤       ├───────────┤     ├───────────┤
+│ user_id │◄──┐   │course_code│◄─┐  │ exam_id   │
 │ username│   │   │course_name│  │  │course_code│
-│ email   │   │   │created_by │──┘  │exam_type │
-└─────────┘   │   └─────────┘       │exam_date │
-     ▲        │        ▲            │created_by│
-     │        │        │            └──────────┘
+│ email   │   │   │created_by │──┘  │exam_type  │
+└─────────┘   │   └───────────┘     │exam_date  │
+     ▲        │        ▲            │created_by │
+     │        │        │            └───────────┘
      │        │        │                 ▲
-┌────┴────┐   │   ┌────┴─────┐           │
-│Syllabus │   │   │Enrollment│      ┌────┴────┐
-│  Item   │   │   ├──────────┤      │Checklist│
-├─────────┤   │   │ roll_no  │      │Progress │
-│ item_id │   │   │course_code│      ├─────────┤
-│ exam_id │   │   │student_id│──┐   │progress_id│
-│parent_id│   └───┤          │  │   │student_id│
-│description│      └──────────┘  └───┤ item_id │
-│created_by│                        │completed│
-└─────────┘                         └─────────┘
+┌────┴──────┐ │   ┌────┴──────┐           │
+│Syllabus   │ │   │Enrollment │      ┌────┴──────┐
+│  Item     │ │   ├───────────┤      │Checklist  │
+├───────────┤ │   │ roll_no   │      │Progress   │
+│ item_id   │ │   │course_code│      ├───────────┤
+│ exam_id   │ │   │student_id │──┐   │progress_id│
+│parent_id  │ └───┤           │  │   │student_id │
+│description│     └───────────┘  └───┤ item_id   │
+│created_by │                        │completed  │
+└───────────┘                        └───────────┘
 ```
 
 ### Tables Description
