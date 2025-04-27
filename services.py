@@ -6,6 +6,7 @@ def create_user_service():
     try:
         data = request.get_json()
         new_user = User(
+            user_id = data['user_id'],
             username=data['username'],
             email=data['email']
         )
