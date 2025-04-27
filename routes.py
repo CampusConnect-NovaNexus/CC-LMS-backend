@@ -26,7 +26,7 @@ def handle_exams(course_code):
         return get_exams_service(course_code)
 
 # Syllabus routes
-@exam_bp.route('/api/exam/exams/<int:exam_id>/syllabus', methods=['GET', 'POST'])
+@exam_bp.route('/api/exam/exams/<string:exam_id>/syllabus', methods=['GET', 'POST'])
 def handle_syllabus(exam_id):
     if request.method == 'POST':
         return add_syllabus_item_service(exam_id)
