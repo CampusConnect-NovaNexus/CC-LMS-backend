@@ -1,11 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
-
+import uuid
 # Create db instance without app
 db = SQLAlchemy()
 
 class User(db.Model):
     __tablename__ = 'users'
-    user_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String, primary_key=True)
     username = db.Column(db.String(255), unique=True, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     
@@ -25,7 +25,7 @@ class Course(db.Model):
     __tablename__ = 'courses'
     course_code = db.Column(db.String(20), primary_key=True)
     course_name = db.Column(db.String(255), nullable=False)
-    created_by = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    created_by = db.Column(db.String, db.ForeignKey('users.user_id'))
     
     # Relationships
     exams = db.relationship('Exam', backref='course', cascade="all, delete-orphan")
@@ -42,7 +42,7 @@ class Enrollment(db.Model):
     __tablename__ = 'enrollments'
     roll_no = db.Column(db.String(10), primary_key=True)
     course_code = db.Column(db.String(20), db.ForeignKey('courses.course_code'))
-    student_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    student_id = db.Column(db.String, db.ForeignKey('users.user_id'))
     
     def json(self):
         return {
@@ -53,11 +53,11 @@ class Enrollment(db.Model):
 
 class Exam(db.Model):
     __tablename__ = 'exams'
-    exam_id = db.Column(db.Integer, primary_key=True)
+    exam_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
     course_code = db.Column(db.String(20), db.ForeignKey('courses.course_code'))
     exam_type = db.Column(db.String(50), nullable=False, unique=True)
     exam_date = db.Column(db.DateTime, nullable=False, unique=True)
-    created_by = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    created_by = db.Column(db.String, db.ForeignKey('users.user_id'))
     
     # Relationships
     syllabus_items = db.relationship('SyllabusItem', backref='exam', cascade="all, delete-orphan")
@@ -73,11 +73,11 @@ class Exam(db.Model):
 
 class SyllabusItem(db.Model):
     __tablename__ = 'syllabus_items'
-    item_id = db.Column(db.Integer, primary_key=True)
-    exam_id = db.Column(db.Integer, db.ForeignKey('exams.exam_id'))
-    parent_item_id = db.Column(db.Integer, db.ForeignKey('syllabus_items.item_id'), nullable=True)
+    item_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    exam_id = db.Column(db.String, db.ForeignKey('exams.exam_id'))
+    parent_item_id = db.Column(db.String, db.ForeignKey('syllabus_items.item_id'), nullable=True)
     description = db.Column(db.Text, nullable=False)
-    created_by = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    created_by = db.Column(db.String, db.ForeignKey('users.user_id'))
     
     # Relationships
     children = db.relationship('SyllabusItem', backref=db.backref('parent', remote_side=[item_id]))
@@ -94,9 +94,9 @@ class SyllabusItem(db.Model):
 
 class ChecklistProgress(db.Model):
     __tablename__ = 'checklist_progress'
-    progress_id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    item_id = db.Column(db.Integer, db.ForeignKey('syllabus_items.item_id'))
+    progress_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    student_id = db.Column(db.String, db.ForeignKey('users.user_id'))
+    item_id = db.Column(db.String, db.ForeignKey('syllabus_items.item_id'))
     is_completed = db.Column(db.Boolean, default=False)
     
     def json(self):

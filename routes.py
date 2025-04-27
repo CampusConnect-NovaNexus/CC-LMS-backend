@@ -44,11 +44,11 @@ def update_progress(item_id):
     return update_progress_service(item_id)
 
 # Get all enrollments for a student
-@exam_bp.route('/api/exam/students/<int:student_id>/enrollments', methods=['GET'])
+@exam_bp.route('/api/exam/students/<string:student_id>/enrollments', methods=['GET'])
 def get_student_enrollments(student_id):
     return get_student_enrollments_service(student_id)
 
 # Get all progress for a student
-@exam_bp.route('/api/exam/students/<int:student_id>/progress', methods=['GET'])
+@exam_bp.route('/api/exam/students/<string:student_id>/progress', methods=['GET'])
 def get_student_progress(student_id):
     return get_student_progress_service(student_id)
