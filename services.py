@@ -22,7 +22,6 @@ def create_course_service():
         new_course = Course(
             course_code=data['course_code'],
             course_name=data['course_name'],
-            description=data.get('description'),
             created_by=data['user_id']
         )
         db.session.add(new_course)
