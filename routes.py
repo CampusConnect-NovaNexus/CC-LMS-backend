@@ -17,6 +17,11 @@ def handle_courses():
     else:
         return get_courses_service()
 
+# Get Courses a student is enrolled in
+@exam_bp.route('/api/exam/students/<string:student_id>/courses', methods=['GET'])
+def get_student_courses(student_id):
+    return get_student_courses_service(student_id)
+
 # Exam routes
 @exam_bp.route('/api/exam/courses/<course_code>/exams', methods=['GET', 'POST'])
 def handle_exams(course_code):

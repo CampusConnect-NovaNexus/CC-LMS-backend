@@ -157,3 +157,18 @@ def get_student_progress_service(student_id):
         return jsonify([item.json() for item in progress_items]), 200
     except Exception as e:
         return make_response(jsonify({'message': "Error getting progress", 'error': str(e)}), 500)
+
+# Get Courses a student is enrolled in
+def get_student_courses_service(student_id):
+    try:
+        enrollments = Enrollment.query.filter_by(student_id=student_id).all()
+        courses = []
+        
+        for enrollment in enrollments:
+            course = Course.query.get(enrollment.course_code)
+            if course:
+                courses.append(course.json())
+        
+        return jsonify(courses), 200
+    except Exception as e:
+        return make_response(jsonify({'message': "Error getting enrollments", 'error': str(e)}), 500)
