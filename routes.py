@@ -57,3 +57,8 @@ def get_student_enrollments(student_id):
 @exam_bp.route('/api/exam/students/<string:student_id>/progress', methods=['GET'])
 def get_student_progress(student_id):
     return get_student_progress_service(student_id)
+
+# Get upcoming exams for a student
+@exam_bp.route('/api/exam/students/<string:student_id>/upcoming-exams', methods=['GET'])
+def get_student_upcoming_exams(student_id):
+    return get_student_upcoming_exams_service(student_id)

@@ -1,5 +1,6 @@
 from flask import request, jsonify, make_response
 from models import db, User, Course, Exam, SyllabusItem, Enrollment, ChecklistProgress
+from datetime import datetime
 
 # User service functions
 def create_user_service():
@@ -172,3 +173,31 @@ def get_student_courses_service(student_id):
         return jsonify(courses), 200
     except Exception as e:
         return make_response(jsonify({'message': "Error getting enrollments", 'error': str(e)}), 500)
+
+# Get upcoming exams for a student
+def get_student_upcoming_exams_service(student_id):
+    try:
+        # Get current date and time
+        current_datetime = datetime.now()
+        
+        # Get all courses the student is enrolled in
+        enrollments = Enrollment.query.filter_by(student_id=student_id).all()
+        course_codes = [enrollment.course_code for enrollment in enrollments]
+        
+        # Query for exams in those courses that have a date in the future
+        upcoming_exams = Exam.query.filter(
+            Exam.course_code.in_(course_codes),
+            Exam.exam_date > current_datetime
+        ).order_by(Exam.exam_date).all()
+        
+        # Format the response
+        result = []
+        for exam in upcoming_exams:
+            course = Course.query.get(exam.course_code)
+            exam_data = exam.json()
+            exam_data['course_name'] = course.course_name if course else "Unknown Course"
+            result.append(exam_data)
+            
+        return jsonify(result), 200
+    except Exception as e:
+        return make_response(jsonify({'message': "Error getting upcoming exams", 'error': str(e)}), 500)
