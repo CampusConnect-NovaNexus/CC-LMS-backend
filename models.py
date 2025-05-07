@@ -55,8 +55,8 @@ class Exam(db.Model):
     __tablename__ = 'exams'
     exam_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
     course_code = db.Column(db.String(20), db.ForeignKey('courses.course_code'))
-    exam_type = db.Column(db.String(50), nullable=False, unique=True)
-    exam_date = db.Column(db.DateTime, nullable=False, unique=True)
+    exam_type = db.Column(db.String(50), nullable=False)
+    exam_date = db.Column(db.DateTime, nullable=False)
     created_by = db.Column(db.String, db.ForeignKey('users.user_id'))
     
     # Relationships
