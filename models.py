@@ -114,6 +114,7 @@ class Update(db.Model):
     update_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
     title = db.Column(db.String(255), nullable=False)
     link = db.Column(db.String(512), nullable=False)
+    sequence = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     def json(self):
@@ -121,5 +122,6 @@ class Update(db.Model):
             'update_id': self.update_id,
             'title': self.title,
             'link': self.link,
+            'sequence': self.sequence,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }

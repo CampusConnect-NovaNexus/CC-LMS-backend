@@ -217,26 +217,31 @@ def get_updates_service():
             items = target_div.find_all('li')[:10]
             notifications = []
             
-            for item in items:
+            # Clear existing updates to maintain the same sequence
+            Update.query.delete()
+            
+            # Add new updates with sequence numbers
+            for idx, item in enumerate(items):
                 a_tag = item.find("a")
                 if a_tag:
                     title = a_tag.get_text(strip=True)
                     link = a_tag.get("href")
                     full_link = "https://www.nitm.ac.in/" + link
                     
-                    # Check if this update already exists in the database
-                    existing_update = Update.query.filter_by(link=full_link).first()
-                    if not existing_update:
-                        # Create a new update record
-                        new_update = Update(
-                            title=title,
-                            link=full_link
-                        )
-                        db.session.add(new_update)
-                        
+                    # Create a new update record with sequence
+                    new_update = Update(
+                        title=title,
+                        link=full_link,
+                        sequence=idx  # Use index as sequence (0-based)
+                    )
+                    db.session.add(new_update)
+                    
                     notifications.append({
+                        "update_id": new_update.update_id,
                         "title": title,
-                        "link": full_link
+                        "link": full_link,
+                        "sequence": idx,
+                        "created_at": new_update.created_at.isoformat() if new_update.created_at else None
                     })
             
             # Commit all new updates to the database
@@ -250,8 +255,8 @@ def get_updates_service():
 
 def get_stored_updates_service():
     try:
-        # Get all updates from the database, ordered by creation date (newest first)
-        updates = Update.query.order_by(Update.created_at.desc()).all()
+        # Get all updates from the database, ordered by sequence (to maintain original order)
+        updates = Update.query.order_by(Update.sequence).all()
         return jsonify([update.json() for update in updates]), 200
     except Exception as e:
         return make_response(jsonify({'message': "Error retrieving updates", 'error': str(e)}), 500)
