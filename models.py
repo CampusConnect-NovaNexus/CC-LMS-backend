@@ -59,6 +59,7 @@ class Exam(db.Model):
     exam_type = db.Column(db.String(50), nullable=False)
     exam_date = db.Column(db.DateTime, nullable=False)
     created_by = db.Column(db.String, db.ForeignKey('users.user_id'))
+    pyq_pdf = db.Column(db.String(500), nullable=True)
     
     # Relationships
     syllabus_items = db.relationship('SyllabusItem', backref='exam', cascade="all, delete-orphan")
