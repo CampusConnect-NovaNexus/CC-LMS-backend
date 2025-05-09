@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 import uuid
+from datetime import datetime, timezone
 # Create db instance without app
 db = SQLAlchemy()
 
@@ -105,4 +106,19 @@ class ChecklistProgress(db.Model):
             'student_id': self.student_id,
             'item_id': self.item_id,
             'is_completed': self.is_completed
+        }
+
+class Update(db.Model):
+    __tablename__ = 'updates'
+    update_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    title = db.Column(db.String(255), nullable=False)
+    link = db.Column(db.String(512), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    def json(self):
+        return {
+            'update_id': self.update_id,
+            'title': self.title,
+            'link': self.link,
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }

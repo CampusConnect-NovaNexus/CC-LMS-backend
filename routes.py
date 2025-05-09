@@ -62,3 +62,12 @@ def get_student_progress(student_id):
 @exam_bp.route('/api/exam/students/<string:student_id>/upcoming-exams', methods=['GET'])
 def get_student_upcoming_exams(student_id):
     return get_student_upcoming_exams_service(student_id)
+
+# Updates routes
+@exam_bp.route('/api/notice/updates', methods=['POST'])
+def fetch_updates():
+    return get_updates_service()
+
+@exam_bp.route('/api/notice/stored-updates', methods=['GET'])
+def get_stored_updates():
+    return get_stored_updates_service()

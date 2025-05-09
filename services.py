@@ -1,6 +1,9 @@
 from flask import request, jsonify, make_response
-from models import db, User, Course, Exam, SyllabusItem, Enrollment, ChecklistProgress
+from models import db, User, Course, Exam, SyllabusItem, Enrollment, ChecklistProgress, Update
 from datetime import datetime
+import requests
+from bs4 import BeautifulSoup
+import json
 
 # User service functions
 def create_user_service():
@@ -201,3 +204,54 @@ def get_student_upcoming_exams_service(student_id):
         return jsonify(result), 200
     except Exception as e:
         return make_response(jsonify({'message': "Error getting upcoming exams", 'error': str(e)}), 500)
+
+# Updates service functions
+def get_updates_service():
+    try:
+        url = request.json.get('url')
+        response = requests.get(url, verify=False)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        target_div = soup.find('div', class_='studentDownloadBox accordion')
+        
+        if target_div:
+            items = target_div.find_all('li')[:10]
+            notifications = []
+            
+            for item in items:
+                a_tag = item.find("a")
+                if a_tag:
+                    title = a_tag.get_text(strip=True)
+                    link = a_tag.get("href")
+                    full_link = "https://www.nitm.ac.in/students_notice" + link
+                    
+                    # Check if this update already exists in the database
+                    existing_update = Update.query.filter_by(link=full_link).first()
+                    if not existing_update:
+                        # Create a new update record
+                        new_update = Update(
+                            title=title,
+                            link=full_link
+                        )
+                        db.session.add(new_update)
+                        
+                    notifications.append({
+                        "title": title,
+                        "link": full_link
+                    })
+            
+            # Commit all new updates to the database
+            db.session.commit()
+            
+            return jsonify(notifications), 200
+        else:
+            return make_response(jsonify({'message': "Section not found"}), 404)
+    except Exception as e:
+        return make_response(jsonify({'message': "Error fetching updates", 'error': str(e)}), 500)
+
+def get_stored_updates_service():
+    try:
+        # Get all updates from the database, ordered by creation date (newest first)
+        updates = Update.query.order_by(Update.created_at.desc()).all()
+        return jsonify([update.json() for update in updates]), 200
+    except Exception as e:
+        return make_response(jsonify({'message': "Error retrieving updates", 'error': str(e)}), 500)

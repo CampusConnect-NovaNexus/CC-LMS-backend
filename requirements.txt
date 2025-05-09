@@ -9,3 +9,6 @@ langchain
 langchain-community 
 upstash-vector
 waitress
+requests
+beautifulsoup4
+python-dotenv
