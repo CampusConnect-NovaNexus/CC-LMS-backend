@@ -71,3 +71,21 @@ def fetch_updates():
 @exam_bp.route('/api/notice/stored-updates', methods=['GET'])
 def get_stored_updates():
     return get_stored_updates_service()
+
+@exam_bp.route('/api/pyq/add', methods=['POST'])
+def add_pyq():
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        data = {
+            'exam_id': request.form.get('exam_id'),
+            'pdf_file': request.files.get('pdf_file') if 'pdf_file' in request.files else None
+        }
+
+        print("Data from form:", data)
+    else:
+        data = request.get_json()
+    return add_pyq_service(data)
+
+@exam_bp.route('/api/pyq/<string:exam_id>', methods=['GET'])
+def get_pyq(exam_id):
+    return get_pyq_service(exam_id)
+    
