@@ -222,7 +222,7 @@ def get_updates_service():
                 if a_tag:
                     title = a_tag.get_text(strip=True)
                     link = a_tag.get("href")
-                    full_link = "https://www.nitm.ac.in/students_notice" + link
+                    full_link = "https://www.nitm.ac.in/" + link
                     
                     # Check if this update already exists in the database
                     existing_update = Update.query.filter_by(link=full_link).first()
