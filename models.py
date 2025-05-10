@@ -40,7 +40,7 @@ class Exam(db.Model):
     course_code = db.Column(db.String(20), db.ForeignKey('courses.course_code'))
     exam_type = db.Column(db.String(50), nullable=False)
     exam_date = db.Column(db.DateTime, nullable=False)
-    user_id = db.Column(db.String , nullable=False, unique=True)
+    user_id = db.Column(db.String , nullable=False)
     pyq_pdf = db.Column(db.String(500), nullable=True)
     
     # Relationships
