@@ -1,24 +1,9 @@
 from flask import request, jsonify, make_response
-from models import db, User, Course, Exam, SyllabusItem, Enrollment, ChecklistProgress, Update
+from models import db, Course, Exam, SyllabusItem, Enrollment, ChecklistProgress, Update
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 import json
-
-# User service functions
-def create_user_service():
-    try:
-        data = request.get_json()
-        new_user = User(
-            user_id = data['user_id'],
-            username=data['username'],
-            email=data['email']
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify({"message": "User created successfully", "user": new_user.json()}), 201
-    except Exception as e:
-        return make_response(jsonify({'message': "Error creating user", 'error': str(e)}), 500)
 
 # Course service functions
 def create_course_service():
@@ -27,7 +12,7 @@ def create_course_service():
         new_course = Course(
             course_code=data['course_code'],
             course_name=data['course_name'],
-            created_by=data['user_id']
+            user_id=data['user_id']
         )
         db.session.add(new_course)
         db.session.commit()
@@ -50,7 +35,7 @@ def create_exam_service(course_code):
             course_code=course_code,
             exam_type=data['exam_type'],
             exam_date=data['exam_date'],
-            created_by=data['user_id']
+            user_id=data['user_id']
         )
         db.session.add(new_exam)
         db.session.commit()
@@ -73,7 +58,7 @@ def add_syllabus_item_service(exam_id):
             exam_id=exam_id,
             parent_item_id=data.get('parent_item_id'),
             description=data['description'],
-            created_by=data['user_id']
+            user_id=data['user_id']
         )
         db.session.add(new_item)
         db.session.commit()

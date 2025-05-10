@@ -4,11 +4,6 @@ from services import *
 # Create a Blueprint
 exam_bp = Blueprint('exam', __name__)
 
-# User route
-@exam_bp.route('/api/exam/users', methods=['POST'])
-def create_user():
-    return create_user_service()
-
 # Course routes
 @exam_bp.route('/api/exam/courses', methods=['GET', 'POST'])
 def handle_courses():
