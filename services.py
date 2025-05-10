@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 import json
+from file_upload_service import file_upload
 
 # Course service functions
 def create_course_service():
@@ -245,3 +246,41 @@ def get_stored_updates_service():
         return jsonify([update.json() for update in updates]), 200
     except Exception as e:
         return make_response(jsonify({'message': "Error retrieving updates", 'error': str(e)}), 500)
+
+def add_pyq_service(data):
+    try:
+        exam_id = data['exam_id']
+        pdf_file = data['pdf_file']
+        if not pdf_file:
+            return make_response(jsonify({'message': "No PDF file provided"}), 400)
+
+        exam = Exam.query.get(exam_id)
+        if not exam:
+            return make_response(jsonify({'message': "Exam not found"}), 404)
+
+        try: 
+            if pdf_file:
+                filename = f"{exam_id}_{pdf_file.filename}"
+                upload_response = file_upload(pdf_file, filename)
+                if upload_response:
+                    # Extract the URL from the ImageKit response
+                    pdf_file_url = upload_response.get('url')
+        except Exception as e:
+            return make_response(jsonify({'message': "Error uploading file", 'error': str(e)}), 500)
+
+        exam.pyq_pdf = pdf_file_url; 
+        db.session.commit()
+
+        return jsonify({"message": "PYQ added successfully"}), 201
+    except Exception as e:
+        return make_response(jsonify({'message': "Error adding PYQ", 'error': str(e)}), 500)
+
+def get_pyq_service(exam_id):
+    try:
+        exam = Exam.query.get(exam_id)
+        if not exam:
+            return make_response(jsonify({'message': "Exam not found"}), 404)
+
+        return jsonify({"pyq_pdf": exam.pyq_pdf}), 200
+    except Exception as e:
+        return make_response(jsonify({'message': "Error retrieving PYQ", 'error': str(e)}), 500)
