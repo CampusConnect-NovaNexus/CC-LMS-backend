@@ -143,6 +143,7 @@ def update_progress_service(item_id):
     try:
         data = request.get_json()
         user_id = data.get('user_id')
+        done = data.get('done')
         
         if not user_id:
             return jsonify({"error": "user_id is required"}), 400
@@ -150,26 +151,79 @@ def update_progress_service(item_id):
         progress = SyllabusItem.query.filter_by(item_id=item_id).first()
         
         if not progress:
-            progress = SyllabusItem(
-                item_id=item_id,
-                completers=[user_id] 
-            )
-            db.session.add(progress)
+            if done:
+                progress = SyllabusItem(
+                    item_id=item_id,
+                    completers=[user_id]
+                )
+                db.session.add(progress)
+            else:
+                return jsonify({"message": "Item not found", "len_completers": 0}), 200
         else:
             if progress.completers is None:
                 progress.completers = []
             
-            if user_id in progress.completers:
-                return jsonify({"message": "User already completed this item", "len_completers": len(progress.completers)}), 200
-                
-            progress.completers = progress.completers + [user_id]
+            user_in_completers = False
+            if progress.completers:
+                for completer in progress.completers:
+                    if completer == user_id:
+                        user_in_completers = True
+                        break
+            
+            
+            if done:
+                if not user_in_completers:
+                    progress.completers.append(user_id)
+                else:
+                    print(f"User {user_id} already in completers, no change needed")
+            else:
+                if user_in_completers:
+                    progress.completers.remove(user_id)
+                else:
+                    print(f"User {user_id} not in completers, no change needed")
+        
+        if not isinstance(progress.completers, list):
+            progress.completers = list(progress.completers) if progress.completers else []
+        
+        progress.completers = list(set(progress.completers))
+        
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(progress, 'completers')
+        
+        completersLength = len(progress.completers)
         
         db.session.commit()
-        return jsonify({"len_completers": len(progress.completers)}), 200
+        
+        exam = Exam.query.filter_by(exam_id=progress.exam_id).first()
+        total_students = 0
+        
+        if exam:
+            course = Course.query.filter_by(course_code=exam.course_code).first()
+            if course:
+                enrollments = Enrollment.query.filter_by(course_code=course.course_code).all()
+                total_students = len(enrollments)
+            else:
+                print("Course not found")
+        else:
+            print("Exam not found")
+        
+        response_data = {
+            "len_completers": completersLength,
+            "action": "added" if done else "removed",
+            "stats": {
+                "total_students": total_students,
+                "who_studied": completersLength,
+                "completers": progress.completers
+            }
+        }
+        
+        
+        return jsonify(response_data), 200
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         db.session.rollback()
         return jsonify({'message': "Error updating progress", 'error': str(e)}), 500
-    
 
 def get_student_progress_service(user_id):
     try:
@@ -177,6 +231,46 @@ def get_student_progress_service(user_id):
         return jsonify([item.json() for item in progress_items]), 200
     except Exception as e:
         return make_response(jsonify({'message': "Error getting progress", 'error': str(e)}), 500)
+
+def get_syllabus_item_stats_service(item_id):
+    try:
+        # Get the syllabus item
+        syllabus_item = SyllabusItem.query.filter_by(item_id=item_id).first()
+        
+        if not syllabus_item:
+            return jsonify({"error": "Syllabus item not found"}), 404
+        
+        # Get the exam associated with this syllabus item
+        exam = Exam.query.filter_by(exam_id=syllabus_item.exam_id).first()
+        
+        if not exam:
+            return jsonify({"error": "Exam not found for this syllabus item"}), 404
+        
+        # Get the course associated with this exam
+        course = Course.query.filter_by(course_code=exam.course_code).first()
+        
+        if not course:
+            return jsonify({"error": "Course not found for this exam"}), 404
+        
+        # Get all enrollments for this course to determine total students
+        enrollments = Enrollment.query.filter_by(course_code=course.course_code).all()
+        total_students = len(enrollments)
+        
+        # Get the number of students who have completed this item
+        completers = syllabus_item.completers or []
+        who_studied = len(completers)
+        
+        return jsonify({
+            "stats": {
+                "total_students": total_students,
+                "who_studied": who_studied,
+                "completers": completers
+            },
+            "item_id": item_id,
+            "description": syllabus_item.description
+        }), 200
+    except Exception as e:
+        return make_response(jsonify({'message': "Error getting syllabus item stats", 'error': str(e)}), 500)
 
 # Get progress of every syllabus item
 def get_progress_syllabus_items_service(item_id):

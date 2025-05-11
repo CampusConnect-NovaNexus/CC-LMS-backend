@@ -53,6 +53,11 @@ def get_student_enrollments(user_id):
 def update_progress(item_id):
     return update_progress_service(item_id)
 
+# Get statistics for a syllabus item
+@exam_bp.route('/api/exam/checklist/<string:item_id>/stats', methods=['GET'])
+def get_syllabus_item_stats(item_id):
+    return get_syllabus_item_stats_service(item_id)
+
 @exam_bp.route('/api/exam/students/<string:user_id>/progress', methods=['GET'])
 def get_student_progress(user_id):
     return get_student_progress_service(user_id)
