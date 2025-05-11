@@ -78,13 +78,13 @@ def get_syllabus_items_service(exam_id):
 def enroll_student_service(course_code):
     try:
         data = request.get_json()
-        student_id = data.get('student_id')
+        user_id = data.get('user_id')
         roll_no = data.get('roll_no')
         
         # Check if enrollment already exists
         existing = Enrollment.query.filter_by(
             course_code=course_code,
-            student_id=student_id
+            user_id=user_id
         ).first()
         
         if existing:
@@ -92,7 +92,7 @@ def enroll_student_service(course_code):
         
         enrollment = Enrollment(
             course_code=course_code,
-            student_id=student_id,
+            user_id=user_id,
             roll_no=roll_no
         )
         db.session.add(enrollment)
@@ -105,16 +105,16 @@ def enroll_student_service(course_code):
 def update_progress_service(item_id):
     try:
         data = request.get_json()
-        student_id = data.get('student_id')
+        user_id = data.get('user_id')
         
         progress = ChecklistProgress.query.filter_by(
-            student_id=student_id,
+            user_id=user_id,
             item_id=item_id
         ).first()
         
         if not progress:
             progress = ChecklistProgress(
-                student_id=student_id,
+                user_id=user_id,
                 item_id=item_id,
                 is_completed=data.get('completed', True)
             )
@@ -127,9 +127,9 @@ def update_progress_service(item_id):
     except Exception as e:
         return make_response(jsonify({'message': "Error updating progress", 'error': str(e)}), 500)
 
-def get_student_enrollments_service(student_id):
+def get_student_enrollments_service(user_id):
     try:
-        enrollments = Enrollment.query.filter_by(student_id=student_id).all()
+        enrollments = Enrollment.query.filter_by(user_id=user_id).all()
         courses = []
         
         for enrollment in enrollments:
@@ -141,17 +141,17 @@ def get_student_enrollments_service(student_id):
     except Exception as e:
         return make_response(jsonify({'message': "Error getting enrollments", 'error': str(e)}), 500)
 
-def get_student_progress_service(student_id):
+def get_student_progress_service(user_id):
     try:
-        progress_items = ChecklistProgress.query.filter_by(student_id=student_id).all()
+        progress_items = ChecklistProgress.query.filter_by(user_id=user_id).all()
         return jsonify([item.json() for item in progress_items]), 200
     except Exception as e:
         return make_response(jsonify({'message': "Error getting progress", 'error': str(e)}), 500)
 
 # Get Courses a student is enrolled in
-def get_student_courses_service(student_id):
+def get_student_courses_service(user_id):
     try:
-        enrollments = Enrollment.query.filter_by(student_id=student_id).all()
+        enrollments = Enrollment.query.filter_by(user_id=user_id).all()
         courses = []
         
         for enrollment in enrollments:
@@ -164,13 +164,13 @@ def get_student_courses_service(student_id):
         return make_response(jsonify({'message': "Error getting enrollments", 'error': str(e)}), 500)
 
 # Get upcoming exams for a student
-def get_student_upcoming_exams_service(student_id):
+def get_student_upcoming_exams_service(user_id):
     try:
         # Get current date and time
         current_datetime = datetime.now()
         
         # Get all courses the student is enrolled in
-        enrollments = Enrollment.query.filter_by(student_id=student_id).all()
+        enrollments = Enrollment.query.filter_by(user_id=user_id).all()
         course_codes = [enrollment.course_code for enrollment in enrollments]
         
         # Query for exams in those courses that have a date in the future

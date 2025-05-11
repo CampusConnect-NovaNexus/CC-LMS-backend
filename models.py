@@ -8,7 +8,7 @@ class Course(db.Model):
     __tablename__ = 'courses'
     course_code = db.Column(db.String(20), primary_key=True)
     course_name = db.Column(db.String(255), nullable=False)
-    user_id = db.Column(db.String , nullable=False, unique=True)
+    user_id = db.Column(db.String , nullable=False)
     
     # Relationships
     exams = db.relationship('Exam', backref='course', cascade="all, delete-orphan")
@@ -25,7 +25,7 @@ class Enrollment(db.Model):
     __tablename__ = 'enrollments'
     roll_no = db.Column(db.String(10), primary_key=True)
     course_code = db.Column(db.String(20), db.ForeignKey('courses.course_code'))
-    user_id = db.Column(db.String , nullable=False, unique=True)
+    user_id = db.Column(db.String , nullable=False)
     
     def json(self):
         return {
@@ -61,7 +61,7 @@ class SyllabusItem(db.Model):
     exam_id = db.Column(db.String, db.ForeignKey('exams.exam_id'))
     parent_item_id = db.Column(db.String, db.ForeignKey('syllabus_items.item_id'), nullable=True)
     description = db.Column(db.Text, nullable=False)
-    user_id = db.Column(db.String , nullable=False, unique=True)
+    user_id = db.Column(db.String , nullable=False)
     
     # Relationships
     children = db.relationship('SyllabusItem', backref=db.backref('parent', remote_side=[item_id]))
@@ -79,7 +79,7 @@ class SyllabusItem(db.Model):
 class ChecklistProgress(db.Model):
     __tablename__ = 'checklist_progress'
     progress_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = db.Column(db.String , nullable=False, unique=True)
+    user_id = db.Column(db.String , nullable=False)
     item_id = db.Column(db.String, db.ForeignKey('syllabus_items.item_id'))
     is_completed = db.Column(db.Boolean, default=False)
     
