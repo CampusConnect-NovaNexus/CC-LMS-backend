@@ -38,17 +38,21 @@ def handle_syllabus(exam_id):
 def enroll_student(course_code):
     return enroll_student_service(course_code)
 
-# Progress routes
-@exam_bp.route('/api/exam/checklist/<int:item_id>', methods=['PUT'])
-def update_progress(item_id):
-    return update_progress_service(item_id)
+# # Progress routes
+# @exam_bp.route('/api/exam/checklist/<int:item_id>', methods=['PUT'])
+# def update_progress(item_id):
+#     return update_progress_service(item_id)
 
 # Get all enrollments for a student
 @exam_bp.route('/api/exam/students/<string:user_id>/enrollments', methods=['GET'])
 def get_student_enrollments(user_id):
     return get_student_enrollments_service(user_id)
 
-# Get all progress for a student
+# Update progress of every syllabus item
+@exam_bp.route('/api/exam/checklist/<string:item_id>', methods=['PUT'])
+def update_progress(item_id):
+    return update_progress_service(item_id)
+
 @exam_bp.route('/api/exam/students/<string:user_id>/progress', methods=['GET'])
 def get_student_progress(user_id):
     return get_student_progress_service(user_id)

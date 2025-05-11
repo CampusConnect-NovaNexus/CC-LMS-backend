@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 import uuid
 from datetime import datetime, timezone
+from sqlalchemy.dialects.postgresql import ARRAY
 # Create db instance without app
 db = SQLAlchemy()
 
@@ -58,13 +59,9 @@ class SyllabusItem(db.Model):
     __tablename__ = 'syllabus_items'
     item_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
     exam_id = db.Column(db.String, db.ForeignKey('exams.exam_id'))
-    parent_item_id = db.Column(db.String, db.ForeignKey('syllabus_items.item_id'), nullable=True)
     description = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.String , nullable=False)
-    
-    # Relationships
-    children = db.relationship('SyllabusItem', backref=db.backref('parent', remote_side=[item_id]))
-    progress = db.relationship('ChecklistProgress', backref='item', cascade="all, delete-orphan")
+    completers = db.Column(ARRAY(db.String), nullable = True, default=[])
     
     def json(self):
         return {
@@ -72,23 +69,11 @@ class SyllabusItem(db.Model):
             'exam_id': self.exam_id,
             'parent_item_id': self.parent_item_id,
             'description': self.description,
-            'created_by': self.user_id
+            'created_by': self.user_id,
+            'completers': self.completers,
+            'completers_len': len(self.completers)
         }
 
-class ChecklistProgress(db.Model):
-    __tablename__ = 'checklist_progress'
-    progress_id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = db.Column(db.String , nullable=False)
-    item_id = db.Column(db.String, db.ForeignKey('syllabus_items.item_id'))
-    is_completed = db.Column(db.Boolean, default=False)
-    
-    def json(self):
-        return {
-            'progress_id': self.progress_id,
-            'student_id': self.user_id,
-            'item_id': self.item_id,
-            'is_completed': self.is_completed
-        }
 
 class Update(db.Model):
     __tablename__ = 'updates'

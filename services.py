@@ -1,5 +1,5 @@
 from flask import request, jsonify, make_response
-from models import db, Course, Exam, SyllabusItem, Enrollment, ChecklistProgress, Update
+from models import db, Course, Exam, SyllabusItem, Enrollment, Update
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
@@ -57,7 +57,6 @@ def add_syllabus_item_service(exam_id):
         data = request.get_json()
         new_item = SyllabusItem(
             exam_id=exam_id,
-            parent_item_id=data.get('parent_item_id'),
             description=data['description'],
             user_id=data['user_id']
         )
@@ -100,30 +99,30 @@ def enroll_student_service(course_code):
         return make_response(jsonify({'message': "Error enrolling student", 'error': str(e)}), 500)
 
 # Progress service functions
-def update_progress_service(item_id):
-    try:
-        data = request.get_json()
-        user_id = data.get('user_id')
+# def update_progress_service(item_id):
+#     try:
+#         data = request.get_json()
+#         user_id = data.get('user_id')
         
-        progress = ChecklistProgress.query.filter_by(
-            user_id=user_id,
-            item_id=item_id
-        ).first()
+#         progress = ChecklistProgress.query.filter_by(
+#             user_id=user_id,
+#             item_id=item_id
+#         ).first()
         
-        if not progress:
-            progress = ChecklistProgress(
-                user_id=user_id,
-                item_id=item_id,
-                is_completed=data.get('completed', True)
-            )
-            db.session.add(progress)
-        else:
-            progress.is_completed = not progress.is_completed
+#         if not progress:
+#             progress = ChecklistProgress(
+#                 user_id=user_id,
+#                 item_id=item_id,
+#                 is_completed=data.get('completed', True)
+#             )
+#             db.session.add(progress)
+#         else:
+#             progress.is_completed = not progress.is_completed
         
-        db.session.commit()
-        return jsonify({"completed": progress.is_completed}), 200
-    except Exception as e:
-        return make_response(jsonify({'message': "Error updating progress", 'error': str(e)}), 500)
+#         db.session.commit()
+#         return jsonify({"completed": progress.is_completed}), 200
+#     except Exception as e:
+#         return make_response(jsonify({'message': "Error updating progress", 'error': str(e)}), 500)
 
 def get_student_enrollments_service(user_id):
     try:
@@ -139,9 +138,42 @@ def get_student_enrollments_service(user_id):
     except Exception as e:
         return make_response(jsonify({'message': "Error getting enrollments", 'error': str(e)}), 500)
 
+
+def update_progress_service(item_id):
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        
+        if not user_id:
+            return jsonify({"error": "user_id is required"}), 400
+            
+        progress = SyllabusItem.query.filter_by(item_id=item_id).first()
+        
+        if not progress:
+            progress = SyllabusItem(
+                item_id=item_id,
+                completers=[user_id] 
+            )
+            db.session.add(progress)
+        else:
+            if progress.completers is None:
+                progress.completers = []
+            
+            if user_id in progress.completers:
+                return jsonify({"message": "User already completed this item", "len_completers": len(progress.completers)}), 200
+                
+            progress.completers = progress.completers + [user_id]
+        
+        db.session.commit()
+        return jsonify({"len_completers": len(progress.completers)}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': "Error updating progress", 'error': str(e)}), 500
+    
+
 def get_student_progress_service(user_id):
     try:
-        progress_items = ChecklistProgress.query.filter_by(user_id=user_id).all()
+        progress_items = SyllabusItem.query.filter_by().all()
         return jsonify([item.json() for item in progress_items]), 200
     except Exception as e:
         return make_response(jsonify({'message': "Error getting progress", 'error': str(e)}), 500)
@@ -149,8 +181,11 @@ def get_student_progress_service(user_id):
 # Get progress of every syllabus item
 def get_progress_syllabus_items_service(item_id):
     try:
-        progress_items = ChecklistProgress.query.filter_by(item_id=item_id).all()
-        return jsonify([item.json() for item in progress_items]), 200
+        progress_items = SyllabusItem.query.filter_by(item_id=item_id).first()
+        if progress_items:
+            return jsonify({SyllabusItem.json(progress_items)}), 200
+        else:
+            return make_response(jsonify({'message': "Item not found"}), 404)
     except Exception as e:
         return make_response(jsonify({'message': "Error getting progress", 'error': str(e)}), 500)
     
