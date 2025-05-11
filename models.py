@@ -67,7 +67,6 @@ class SyllabusItem(db.Model):
         return {
             'item_id': self.item_id,
             'exam_id': self.exam_id,
-            'parent_item_id': self.parent_item_id,
             'description': self.description,
             'created_by': self.user_id,
             'completers': self.completers,
