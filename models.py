@@ -23,13 +23,12 @@ class Course(db.Model):
 
 class Enrollment(db.Model):
     __tablename__ = 'enrollments'
-    roll_no = db.Column(db.String(10), primary_key=True)
+    _id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
     course_code = db.Column(db.String(20), db.ForeignKey('courses.course_code'))
     user_id = db.Column(db.String , nullable=False)
     
     def json(self):
         return {
-            'roll_no': self.roll_no,
             'course_code': self.course_code,
             'student_id': self.user_id
         }

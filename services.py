@@ -79,7 +79,6 @@ def enroll_student_service(course_code):
     try:
         data = request.get_json()
         user_id = data.get('user_id')
-        roll_no = data.get('roll_no')
         
         # Check if enrollment already exists
         existing = Enrollment.query.filter_by(
@@ -93,7 +92,6 @@ def enroll_student_service(course_code):
         enrollment = Enrollment(
             course_code=course_code,
             user_id=user_id,
-            roll_no=roll_no
         )
         db.session.add(enrollment)
         db.session.commit()
@@ -148,6 +146,14 @@ def get_student_progress_service(user_id):
     except Exception as e:
         return make_response(jsonify({'message': "Error getting progress", 'error': str(e)}), 500)
 
+# Get progress of every syllabus item
+def get_progress_syllabus_items_service(item_id):
+    try:
+        progress_items = ChecklistProgress.query.filter_by(item_id=item_id).all()
+        return jsonify([item.json() for item in progress_items]), 200
+    except Exception as e:
+        return make_response(jsonify({'message': "Error getting progress", 'error': str(e)}), 500)
+    
 # Get Courses a student is enrolled in
 def get_student_courses_service(user_id):
     try:

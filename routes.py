@@ -13,9 +13,9 @@ def handle_courses():
         return get_courses_service()
 
 # Get Courses a student is enrolled in
-@exam_bp.route('/api/exam/students/<string:student_id>/courses', methods=['GET'])
-def get_student_courses(student_id):
-    return get_student_courses_service(student_id)
+@exam_bp.route('/api/exam/students/<string:user_id>/courses', methods=['GET'])
+def get_student_courses(user_id):
+    return get_student_courses_service(user_id)
 
 # Exam routes
 @exam_bp.route('/api/exam/courses/<course_code>/exams', methods=['GET', 'POST'])
@@ -44,19 +44,19 @@ def update_progress(item_id):
     return update_progress_service(item_id)
 
 # Get all enrollments for a student
-@exam_bp.route('/api/exam/students/<string:student_id>/enrollments', methods=['GET'])
-def get_student_enrollments(student_id):
-    return get_student_enrollments_service(student_id)
+@exam_bp.route('/api/exam/students/<string:user_id>/enrollments', methods=['GET'])
+def get_student_enrollments(user_id):
+    return get_student_enrollments_service(user_id)
 
 # Get all progress for a student
-@exam_bp.route('/api/exam/students/<string:student_id>/progress', methods=['GET'])
-def get_student_progress(student_id):
-    return get_student_progress_service(student_id)
+@exam_bp.route('/api/exam/students/<string:user_id>/progress', methods=['GET'])
+def get_student_progress(user_id):
+    return get_student_progress_service(user_id)
 
 # Get upcoming exams for a student
-@exam_bp.route('/api/exam/students/<string:student_id>/upcoming-exams', methods=['GET'])
-def get_student_upcoming_exams(student_id):
-    return get_student_upcoming_exams_service(student_id)
+@exam_bp.route('/api/exam/students/<string:user_id>/upcoming-exams', methods=['GET'])
+def get_student_upcoming_exams(user_id):
+    return get_student_upcoming_exams_service(user_id)
 
 # Updates routes
 @exam_bp.route('/api/notice/updates', methods=['POST'])
