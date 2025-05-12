@@ -1,4 +1,21 @@
-# Campus Connect LMS API Documentation
+# Learning Management System (LMS) - CampusConnect
+
+This service handles the learning management functionality for the CampusConnect platform, including course management, exam scheduling, syllabus organization, and student progress tracking.
+
+## Technologies
+- Python 3.x
+- Flask (Web Framework)
+- PostgreSQL with SQLAlchemy ORM
+- Flask-Migrate (Database Migrations)
+- Waitress (Production WSGI Server)
+- Docker for containerization
+
+## Features
+- Course management and enrollment
+- Exam creation and scheduling
+- Hierarchical syllabus organization
+- Student progress tracking
+- File upload for course materials
 
 ## API Overview
 This documentation provides details on the Campus Connect Exam API endpoints, their usage, and the database structure to help frontend developers integrate with the backend.
