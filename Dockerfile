@@ -21,5 +21,5 @@ RUN mkdir -p /app/uploads
 # Expose the port the app runs on
 EXPOSE 4000
 
-# Command to run the application
-CMD ["python", "app.py"]
+# Command to run the application using Flask CLI
+CMD ["flask", "run", "--host=0.0.0.0", "--port=9000"]
