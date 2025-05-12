@@ -13,13 +13,12 @@ COPY . .
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV PORT=4000
-
-# Create uploads directory if not exists
-RUN mkdir -p /app/uploads
+ENV PORT=5000
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=production
 
 # Expose the port the app runs on
-EXPOSE 4000
+EXPOSE 5000
 
-# Command to run the application using Flask CLI
-CMD ["flask", "run", "--host=0.0.0.0", "--port=9000"]
+# Command to run the application
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
