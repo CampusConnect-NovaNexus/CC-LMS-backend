@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+env/
+venv/
+ENV/
+.env.*
+
+# VS Code
+.vscode/
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Uploaded files (if you have a separate storage solution)
+uploads/
+media/
